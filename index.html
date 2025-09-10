@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Delizioso — Version 01</title>
+<style>
+  :root{
+    --bg:#faf8f6;
+    --card:#ffffff;
+    --accent:#d35400;
+    --muted:#6b6b6b;
+    --shadow: 0 6px 18px rgba(18,18,18,0.08);
+    --glass: rgba(255,255,255,0.6);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#fff 0%, #fbf6f1 100%);
+    color:#222;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 24px;
+    position:sticky;
+    top:0;
+    backdrop-filter: blur(6px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+    box-shadow: var(--shadow);
+    z-index:10;
+  }
+  .brand{display:flex; align-items:center; gap:12px; font-weight:700; font-size:1.1rem; color:var(--accent)}
+  .brand svg{width:36px;height:36px}
+  nav a{margin-left:18px; text-decoration:none; color:#333; font-weight:600; font-size:0.95rem}
+  .hero{
+    display:grid;
+    grid-template-columns:1fr 420px;
+    gap:32px;
+    align-items:center;
+    padding:48px 6%;
+  }
+  .hero-left h1{font-size:2.1rem; margin:0 0 12px}
+  .hero-left p{color:var(--muted); margin:0 0 18px}
+  .cta{display:inline-block; background:var(--accent); color:#fff; padding:12px 18px; border-radius:10px; text-decoration:none; font-weight:700}
+  .hero-right{
+    background:linear-gradient(180deg,#fff,#fff);
+    border-radius:14px; padding:18px; box-shadow:var(--shadow);
+  }
+
+  /* Menu section */
+  .section{padding:36px 6%}
+  .section h2{margin:0 0 16px}
+  .filters{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .filters button{padding:8px 12px;border-radius:10px;border:1px solid #eee;background:var(--card);cursor:pointer}
+  .menu-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px}
+  .card{background:var(--card); padding:12px; border-radius:12px; box-shadow:var(--shadow); display:flex; gap:12px; align-items:center}
+  .thumb{width:90px;height:70px;border-radius:10px; background:linear-gradient(135deg,#fbe3d6,#ffd9c2); display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+  .meta h3{margin:0;font-size:1rem}
+  .meta p{margin:6px 0 0;color:var(--muted); font-size:0.9rem}
+  .price{margin-left:auto; font-weight:800; color:var(--accent)}
+
+  /* Reservation modal */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; padding:20px; visibility:hidden; opacity:0; transition:opacity .18s}
+  .modal{background:var(--card); padding:18px; border-radius:12px; width:100%; max-width:420px; box-shadow:var(--shadow)}
+  .modal.show{visibility:visible; opacity:1}
+  .form-row{display:flex; gap:10px}
+  .form-row input, .form-row select, textarea, input[type="text"], input[type="email"], input[type="tel"], input[type="number"]{
+    width:100%; padding:10px; border-radius:8px; border:1px solid #e9e9e9; font-size:0.95rem;
+  }
+  .close-btn{background:transparent;border:none;font-weight:700;cursor:pointer;float:right}
+
+  footer{padding:20px 6%; color:var(--muted); font-size:0.9rem}
+  @media (max-width:860px){
+    .hero{grid-template-columns:1fr; padding:28px 4%}
+    nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L15 8H9L12 2Z" fill="currentColor"/><circle cx="12" cy="15" r="6" fill="currentColor" opacity=".12"/></svg>
+    Delizioso
+  </div>
+  <nav>
+    <a href="#menu">Menu</a>
+    <a href="#about">About</a>
+    <a href="#reserve" id="reserve-cta">Reserve</a>
+  </nav>
+</header>
+
+<section class="hero" aria-label="hero">
+  <div class="hero-left">
+    <h1>Fresh food. Cozy vibes.</h1>
+    <p>Delizioso — hand-crafted seasonal dishes and quick delivery. Manage orders or book a table in seconds.</p>
+    <a class="cta" id="open-reserve">Reserve a Table</a>
+  </div>
+
+  <aside class="hero-right" aria-hidden="false">
+    <h3>Today’s Special</h3>
+    <p style="color:var(--muted); margin-top:6px">Chef's pick — roasted pumpkin gnocchi with sage brown butter.</p>
+    <div style="margin-top:12px; display:flex; gap:10px; align-items:center">
+      <div style="background:linear-gradient(135deg,#ffe9d1,#ffccb0); width:72px;height:72px;border-radius:10px; display:flex;align-items:center; justify-content:center; font-weight:800; color:var(--accent)">G</div>
+      <div>
+        <strong>$12.50</strong>
+        <div style="color:var(--muted); font-size:0.9rem">Available until 9pm</div>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<section id="menu" class="section">
+  <h2>Menu</h2>
+  <div class="filters" role="toolbar" aria-label="menu filters">
+    <button data-filter="all">All</button>
+    <button data-filter="starters">Starters</button>
+    <button data-filter="mains">Mains</button>
+    <button data-filter="dessert">Dessert</button>
+    <button data-filter="drinks">Drinks</button>
+  </div>
+
+  <div class="menu-grid" id="menuGrid">
+    <!-- Cards inserted by JS -->
+  </div>
+</section>
+
+<section id="about" class="section" style="padding-top:6px">
+  <h2>About</h2>
+  <p style="color:var(--muted)">Family-run since 2015. We craft every plate with seasonal ingredients and love.</p>
+</section>
+
+<footer>
+  © Delizioso — 2025 · 123 Flavor Street, City
+</footer>
+
+<!-- Reservation Modal -->
+<div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reserveTitle">
+    <button class="close-btn" id="closeModal">✕</button>
+    <h3 id="reserveTitle">Reserve a table</h3>
+    <p style="color:var(--muted); margin-top:6px">Quick booking — we’ll confirm via email.</p>
+    <form id="reserveForm" style="margin-top:12px" onsubmit="return false;">
+      <div style="margin-bottom:8px">
+        <input type="text" id="name" placeholder="Your name" required />
+      </div>
+      <div class="form-row" style="margin-bottom:8px">
+        <input type="tel" id="phone" placeholder="Phone" required />
+        <input type="number" id="guests" placeholder="Guests" min="1" max="12" required />
+      </div>
+      <div style="margin-bottom:8px">
+        <input type="datetime-local" id="datetime" required />
+      </div>
+      <div style="text-align:right">
+        <button class="cta" id="submitReserve" style="background:var(--accent); border:none">Confirm</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Sample menu data
+  const menu = [
+    {id:1, name:"Bruschetta", cat:"starters", price:6.5, desc:"Toasted sourdough, tomato, basil"},
+    {id:2, name:"Pumpkin Gnocchi", cat:"mains", price:12.5, desc:"Sage brown butter"},
+    {id:3, name:"Margherita Pizza", cat:"mains", price:11.0, desc:"Fresh mozzarella, basil"},
+    {id:4, name:"Tiramisu", cat:"dessert", price:7.0, desc:"Espresso-soaked ladyfingers"},
+    {id:5, name:"Caesar Salad", cat:"starters", price:8.0, desc:"Romaine, parmesan"},
+    {id:6, name:"Lemonade", cat:"drinks", price:3.5, desc:"House-made lemon soda"},
+    {id:7, name:"Ribeye Steak", cat:"mains", price:19.0, desc:"12oz with herb butter"},
+    {id:8, name:"Chocolate Lava Cake", cat:"dessert", price:8.0, desc:"Warm, gooey center"}
+  ];
+
+  const menuGrid = document.getElementById('menuGrid');
+
+  function render(items){
+    menuGrid.innerHTML = items.map(it => `
+      <article class="card" data-id="${it.id}" data-cat="${it.cat}">
+        <div class="thumb">${it.name.split(' ').map(w=>w[0]).slice(0,2).join('')}</div>
+        <div class="meta">
+          <h3>${it.name}</h3>
+          <p>${it.desc}</p>
+        </div>
+        <div class="price">$${it.price.toFixed(2)}</div>
+      </article>
+    `).join('');
+  }
+
+  render(menu);
+
+  // Filter buttons
+  document.querySelectorAll('.filters button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const filter = btn.getAttribute('data-filter');
+      if(filter === 'all') render(menu);
+      else render(menu.filter(m=>m.cat === filter));
+    });
+  });
+
+  // Reservation modal logic
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const openReserve = document.getElementById('open-reserve');
+  const closeModal = document.getElementById('closeModal');
+  const submitReserve = document.getElementById('submitReserve');
+
+  function showModal(){ modalBackdrop.classList.add('show'); modalBackdrop.style.visibility='visible'; modalBackdrop.setAttribute('aria-hidden','false'); }
+  function hideModal(){ modalBackdrop.classList.remove('show'); modalBackdrop.style.visibility='hidden'; modalBackdrop.setAttribute('aria-hidden','true'); }
+
+  openReserve.addEventListener('click', showModal);
+  document.getElementById('reserve-cta').addEventListener('click', (e)=>{ e.preventDefault(); showModal(); });
+
+  closeModal.addEventListener('click', hideModal);
+  modalBackdrop.addEventListener('click', (e)=>{ if(e.target === modalBackdrop) hideModal(); });
+
+  submitReserve.addEventListener('click', ()=>{
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const guests = document.getElementById('guests').value;
+    const datetime = document.getElementById('datetime').value;
+    if(!name || !phone || !guests || !datetime){ alert('Please complete all fields'); return; }
+    // fake submit
+    alert(`Thanks ${name}! Your table for ${guests} on ${new Date(datetime).toLocaleString()} is requested.`);
+    hideModal();
+    document.getElementById('reserveForm').reset();
+  });
+</script>
+</body>
+</html>
